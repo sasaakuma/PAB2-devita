@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notes/services/note_service.dart';
+import 'package:notes/note_service.dart';
 
 
 class NoteDialog extends StatelessWidget {
@@ -14,7 +14,6 @@ class NoteDialog extends StatelessWidget {
       _descriptionController.text = note!['description'];
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
