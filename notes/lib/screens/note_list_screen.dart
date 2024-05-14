@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:notes/widgets/note_dialog.dart';
 import 'package:notes/note_service.dart';
 import 'package:notes/widgets/note_dialog.dart';
@@ -6,11 +7,9 @@ import 'package:notes/widgets/note_dialog.dart';
 class NoteListScreen extends StatefulWidget {
   const NoteListScreen({super.key});
 
-
   @override
   State<NoteListScreen> createState() => _NoteListScreenState();
 }
-
 
 class _NoteListScreenState extends State<NoteListScreen> {
   @override
@@ -36,15 +35,13 @@ class _NoteListScreenState extends State<NoteListScreen> {
   }
 }
 
-
 class NoteList extends StatelessWidget {
   const NoteList({super.key});
-
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: noteService.getNoteList(),
+      stream: NoteService.getNoteList(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -72,7 +69,7 @@ class NoteList extends StatelessWidget {
                     subtitle: Text(document['description']),
                     trailing: InkWell(
                       onTap: () {
-                        noteService.deleteNote(document['id']);
+                        NoteService.deleteNote(document['id']);
                       },
                       child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
