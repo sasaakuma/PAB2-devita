@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:notes/models/note.dart';
@@ -18,16 +17,6 @@ class _NoteDialogState extends State<NoteDialog> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   File? _imageFile;
-
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
-  }
 
   @override
   void initState() {
@@ -71,42 +60,28 @@ class _NoteDialogState extends State<NoteDialog> {
           TextField(
             controller: _descriptionController,
           ),
-
           const Padding(
             padding: EdgeInsets.only(top: 20),
-            child: Text(
-              'Image: ',
-            ),
+            child: Text('Image: '),
           ),
           Expanded(
-            child: _imageFile! = null
-            ? Image.file(_imageFile, fit: BoxFit.cover,)
-            : (widget.note?.imageUrl != null &&
-            Uri.parse(widget.note!.imageUrl!).isAbsolute)
-              ? Image.network(widget.note!.imageUrl!, fit: BoxFit.cover,)
-              : Container(),
+              child: _imageFile != null
+                  ? Image.file(_imageFile!, fit: BoxFit.cover)
+                  : (widget.note?.imageUrl != null &&
+                          Uri.parse(widget.note!.imageUrl!).isAbsolute
+                      ? Image.network(widget.note!.imageUrl!, fit: BoxFit.cover)
+                      : Container())),
+          TextButton(
+            onPressed: _pickImage,
+            child: const Text('Pick Image'),
           ),
-              TextButton(onPressed: _pickImage, child: const Text('Pick Image')
-          ),
-
-
-          const Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: Text('Pick Image : '),
-          ),
-          _imageFile != null ? Image.file(_imageFile!) : Container(),
-          TextButton(onPressed: _pickImage, child: const Text('Pick Image'))
         ],
       ),
       actions: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: ElevatedButton(
-            onPressed: () async {
-              String? imageUrl;
-              if(_imageFile != null) {
-                imageUrl = await NoteService.uploadImage(_imageFile);
-              }
+            onPressed: () {
               Navigator.of(context).pop();
             },
             child: const Text('Cancel'),
@@ -117,13 +92,17 @@ class _NoteDialogState extends State<NoteDialog> {
             String? imageUrl;
             if (_imageFile != null) {
               imageUrl = await NoteService.uploadImage(_imageFile!);
+            } else {
+              imageUrl = widget.note?.imageUrl;
             }
             Note note = Note(
-                title: _titleController.text,
-                description: _descriptionController.text,
-                id: widget.note?.id,
-                imageUrl: imageUrl,
-                createdAt: widget.note?.createdAt);
+              id: widget.note?.id,
+              title: _titleController.text,
+              description: _descriptionController.text,
+              imageUrl: imageUrl,
+              createdAt: widget.note?.createdAt,
+            );
+
             if (widget.note == null) {
               NoteService.addNote(note)
                   .whenComplete(() => Navigator.of(context).pop());
